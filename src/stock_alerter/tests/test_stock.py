@@ -27,6 +27,11 @@ class StockTest(unittest.TestCase):
 		self.goog.update(datetime(2014, 2, 13), price=8.4)
 		self.assertAlmostEqual(8.4, self.goog.price, delta=0.0001)
 
+	def test_stock_price_should_give_the_latest_price_by_timestamp(self):
+		self.goog.update(datetime(2014, 2, 13), price=10)
+		self.goog.update(datetime(2014, 2, 12), price=8.4)
+		self.assertAlmostEqual(10, self.goog.price, delta=0.0001)
+
 class StockTrendTest(unittest.TestCase):
 
 	def setUp(self):
@@ -49,3 +54,9 @@ class StockTrendTest(unittest.TestCase):
 	def test_increasing_trend_is_false_if_price_equal(self):
 		self.given_a_series_of_prices([8, 10, 10])
 		self.assertFalse(self.goog.is_increasing_trend())
+
+	def test_increasing_trend_is_true_when_updates_out_of_order(self):
+		self.goog.update(datetime(2014, 2, 14), 12)
+		self.goog.update(datetime(2014, 2, 13), 10)
+		self.goog.update(datetime(2014, 2, 12), 8)
+		self.assertTrue(self.goog.is_increasing_trend())
