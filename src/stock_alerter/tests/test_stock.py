@@ -1,5 +1,7 @@
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
+import collections
+
 from ..stock import Stock
 
 
@@ -60,3 +62,36 @@ class StockTrendTest(unittest.TestCase):
 		self.goog.update(datetime(2014, 2, 13), 10)
 		self.goog.update(datetime(2014, 2, 12), 8)
 		self.assertTrue(self.goog.is_increasing_trend())
+
+class StockCrossOverSignalTest(unittest.TestCase):
+	def setUp(self):
+		self.goog = Stock("GOOG")
+
+	def _flatten(self, timestamps):
+		if not isinstance(timestamp, collections.Iterable):
+			yield timestamp
+		else:
+			for value in self._flatten(timestamp):
+				yield value
+
+	def _generate_timestamp_for_date(self, date, price_list):
+		if not isinstance(price_list, collections.Iterable):
+			return date
+		else:
+			delta = 1.0/len(price_list)
+			return [date + i*timedelta(delta) for i in range(len(price_list))]
+
+	def _generate_timestamps(self, price_list):
+		return list(self._flatten([
+			self._generate_timestamp_for_date(datetime(2014, 2, 13) - timedelta(i),
+				price_list[len(price_list)-i-1])
+			for i in range(len(price_list) - 1, -1, -1)
+			if price_list[len(price_list) - i - 1] is not None]))
+
+	def given_a_series_of_prices(self, price_list):
+		timestamps = self._generate_timestamps(price_list)
+		for timestamp, price in zip(timestamps,
+					list(self._flatten([p
+							for p in price_list
+							if p is not None]))):
+			self.goog.update(timestamp, price)	
