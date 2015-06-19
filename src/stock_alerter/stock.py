@@ -32,7 +32,7 @@ class Stock:
 		cpl = []
 		for i in range(11):
 			chk = on_date.date() - timedelta(i)
-			for price_event in reversed(self.price_history)
+			for price_event in reversed(self.price_history):
 				if price_event.timestamp.date() > chk:
 					pass
 				if price_event.timestamp.date() == chk:
