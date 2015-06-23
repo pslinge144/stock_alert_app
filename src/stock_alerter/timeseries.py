@@ -33,3 +33,7 @@ class TimeSeries:
 					closing_price_list.insert(0, price_event)
 					break
 		return closing_price_list
+
+
+class NotEnoughDataException(Exception):
+	pass
