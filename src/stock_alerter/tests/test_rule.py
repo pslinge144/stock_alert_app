@@ -1,11 +1,12 @@
 import unittest
 from datetime import datetime
+
 from ..stock import Stock
 from ..rule import PriceRule
 from ..rule import AndRule
 
-class PriceRuleTest(unittest.TestCase):
 
+class PriceRuleTest(unittest.TestCase):
 	@classmethod
 	def setUpClass(cls):
 		goog = Stock("GOOG")
@@ -33,8 +34,8 @@ class PriceRuleTest(unittest.TestCase):
 		rule = PriceRule("MSFT", lambda stock: stock.price > 10)
 		self.assertEqual({"MSFT"}, rule.depends_on())
 
-class AndRuleTest(unittest.TestCase):
 
+class AndRuleTest(unittest.TestCase):
 	@classmethod
 	def setUpClass(cls):
 		goog = Stock("GOOG")

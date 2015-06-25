@@ -1,8 +1,8 @@
-import bisect
-from .timeseries import TimeSeries, NotEnoughDataException
-from .movingaverage import MovingAverage
 from datetime import timedelta
 from enum import Enum
+
+from .event import Event
+from .timeseries import TimeSeries, MovingAverage, NotEnoughDataException
 
 
 class StockSignal(Enum):
@@ -18,6 +18,7 @@ class Stock:
 	def __init__(self, symbol):
 		self.symbol = symbol
 		self.history = TimeSeries()
+		self.updated = Event()
 
 	@property
 	def price(self):
@@ -30,12 +31,12 @@ class Stock:
 		if price < 0:
 			raise ValueError("price should not be negative")
 		self.history.update(timestamp, price)
+		self.updated.fire(self)
 
 	def is_increasing_trend(self):
 		return self.history[-3].value < \
 			self.history[-2].value < \
 				self.history[-1].value
-
 
 	def _is_crossover_below_to_above(self, on_date, ma, reference_ma):
 		prev_date = on_date - timedelta(1)
@@ -43,7 +44,6 @@ class Stock:
 			    < reference_ma.value_on(prev_date)
 			and ma.value_on(on_date)
 			    > reference_ma.value_on(on_date))
-
 
 	def get_crossover_signal(self, on_date):
 		long_term_ma = \

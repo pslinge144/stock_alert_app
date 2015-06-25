@@ -1,12 +1,11 @@
 import unittest
-from datetime import datetime, timedelta
 import collections
+from datetime import datetime, timedelta
 
 from ..stock import Stock, StockSignal
 
 
 class StockTest(unittest.TestCase):
-
 	def setUp(self):
 		self.goog = Stock("GOOG")
 		
@@ -34,8 +33,14 @@ class StockTest(unittest.TestCase):
 		self.goog.update(datetime(2014, 2, 12), price=8.4)
 		self.assertAlmostEqual(10, self.goog.price, delta=0.0001)
 
-class StockTrendTest(unittest.TestCase):
+	def test_increasing_trend_is_true_when_updates_out_of_order(self):
+		self.goog.update(datetime(2014, 2, 14), 12)
+		self.goog.update(datetime(2014, 2, 13), 10)
+		self.goog.update(datetime(2014, 2, 12), 8)
+		self.assertTrue(self.goog.is_increasing_trend())
 
+
+class StockTrendTest(unittest.TestCase):
 	def setUp(self):
 		self.goog = Stock("GOOG")
 
@@ -57,11 +62,6 @@ class StockTrendTest(unittest.TestCase):
 		self.given_a_series_of_prices([8, 10, 10])
 		self.assertFalse(self.goog.is_increasing_trend())
 
-	def test_increasing_trend_is_true_when_updates_out_of_order(self):
-		self.goog.update(datetime(2014, 2, 14), 12)
-		self.goog.update(datetime(2014, 2, 13), 10)
-		self.goog.update(datetime(2014, 2, 12), 8)
-		self.assertTrue(self.goog.is_increasing_trend())
 
 class StockCrossOverSignalTest(unittest.TestCase):
 	def setUp(self):
